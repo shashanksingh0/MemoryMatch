@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { palette, radius } from '../theme/colors';
 import { Screen } from '../components/Screen';
 import { Header } from '../components/Header';
@@ -77,7 +77,15 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { settings, updateSettings, resetProgress, textScale } = useSettings();
 
   const handleReset = () => {
-    Alert.alert('Reset Progress?', 'This will clear your coins, statistics, and achievements.', [
+    const message = 'This will clear your coins, statistics, and achievements.';
+    if (Platform.OS === 'web') {
+      const webConfirm = (globalThis as { confirm?: (message?: string) => boolean }).confirm;
+      if (typeof webConfirm === 'function' && webConfirm(`Reset Progress?\n\n${message}`)) {
+        resetProgress();
+      }
+      return;
+    }
+    Alert.alert('Reset Progress?', message, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Reset',
