@@ -132,13 +132,13 @@ scripts/generate-sounds.js
 ## Scripts
 
 ```bash
-npm start        # Start the Expo dev server
-npm run web      # Start for web
-npm run ios      # Start for iOS
-npm run android  # Start for Android
-npm run typecheck # Type-check the codebase (tsc --noEmit)
-npm test         # Run the unit test suite (vitest)
-npm run sounds   # Regenerate the sound effect WAV files
+npm start
+npm run web
+npm run ios
+npm run android
+npm run typecheck
+npm test
+npm run sounds
 ```
 
 ## Testing
@@ -149,6 +149,118 @@ shuffle determinism, scoring math, and statistics tracking:
 ```bash
 npm test
 ```
+
+## Building APK and iOS Build Files
+
+There are two ways to produce installable app files: **EAS Build** in the cloud
+(recommended, no local native toolchain needed) or a **local native build**.
+
+### Prerequisites
+
+- **Android APK**: no Apple credentials required. A release build is signed
+  with a keystore and can be installed on any Android device directly.
+- **iOS .ipa**: requires a paid Apple Developer account. A signed `.ipa` only
+  installs on devices that are part of the provisioning profile (or are
+  distributed via TestFlight / an Enterprise or MDM system). An unsigned `.ipa`
+  cannot be sideloaded onto a physical iPhone.
+
+### Option A — EAS Build (cloud)
+
+1. Install the EAS CLI and log in with your Expo account:
+
+```bash
+npm install -g eas-cli
+eas login
+```
+
+2. The repository already includes an `eas.json` with three profiles:
+
+| Profile      | Android output              | iOS output                              |
+| ------------ | --------------------------- | --------------------------------------- |
+| `development`| development build           | development client                      |
+| `preview`    | signed **APK**              | unsigned simulator `.ipa`               |
+| `production` | **AAB** (Google Play)       | signed `.ipa` (App Store / TestFlight)  |
+
+3. Build an Android APK (installable, ready to upload to your server):
+
+```bash
+eas build --platform android --profile preview
+```
+
+When the build finishes, EAS prints a download link. Download the APK and
+upload it wherever you want to host it.
+
+4. Build an Android app bundle for the Google Play Store:
+
+```bash
+eas build --platform android --profile production
+```
+
+This produces a `.aab` file to upload to the Play Console.
+
+5. Build an iOS `.ipa` for the App Store / TestFlight:
+
+```bash
+eas build --platform ios --profile production
+```
+
+EAS creates and manages the signing certificate and provisioning profile for
+you. Once the build is ready, submit it with:
+
+```bash
+eas submit --platform ios
+```
+
+For a quick unsigned iOS build that only runs in the Simulator:
+
+```bash
+eas build --platform ios --profile preview
+```
+
+### Option B — Local builds
+
+Generate the native projects first (required once before any local native
+build):
+
+```bash
+npx expo prebuild
+```
+
+**Android** (requires Android Studio / the Android SDK):
+
+```bash
+npx expo run:android --variant release
+```
+
+or, from the `android/` directory:
+
+```bash
+./gradlew assembleRelease
+```
+
+The APK is written to
+`android/app/build/outputs/apk/release/app-release.apk`, signed with the
+keystore configured in `android/app/build.gradle`.
+
+**iOS** (requires macOS and Xcode):
+
+```bash
+npx expo run:ios --configuration Release
+```
+
+Then open `ios/*.xcworkspace` in Xcode, choose **Product > Archive**, and use
+**Distribute App** to export a signed `.ipa` (ad-hoc, TestFlight, or App Store
+depending on your distribution certificate and provisioning profile).
+
+### Uploading the build to a server
+
+- **Android**: upload the `.apk` (or `.aab`) to any static host (S3, a VPS,
+  object storage, etc.) and share the download link. Users install the APK
+  directly from the link.
+- **iOS**: a `.ipa` cannot be installed by opening a link on an iPhone. It must
+  be distributed through TestFlight, an Enterprise/MDM deployment, or an ad-hoc
+  build signed against the provisioning profile that includes the target
+  device's UDID.
 
 ## Customization
 
