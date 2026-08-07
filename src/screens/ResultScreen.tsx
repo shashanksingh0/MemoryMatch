@@ -13,6 +13,7 @@ import { palette, radius } from '../theme/colors';
 import { Screen } from '../components/Screen';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Confetti } from '../components/Confetti';
+import { CoinIcon } from '../components/CoinIcon';
 import { useSettings } from '../context/SettingsContext';
 import { formatTime } from '../utils/scoring';
 import { accuracyPercentage } from '../utils/scoring';
@@ -72,7 +73,7 @@ function CoinReward({ coins, textScale }: { coins: number; textScale: number }) 
 
   return (
     <Animated.View style={[styles.coinReward, animatedStyle]} accessibilityLabel={`Earned ${coins} coins`}>
-      <Text style={{ fontSize: 30 * textScale }}>🪙</Text>
+      <CoinIcon size={30 * textScale} />
       <Text style={[styles.coinRewardValue, { fontSize: 24 * textScale }]}>+{display}</Text>
     </Animated.View>
   );
@@ -172,7 +173,10 @@ export function ResultScreen({ result, onPlayAgain, onHome, onAchievements }: Re
             />
           </View>
 
-          <Text style={[styles.balanceText, { fontSize: 13 * textScale }]}>Total coins: 🪙 {stats.totalCoins}</Text>
+          <View style={styles.balanceRow}>
+            <CoinIcon size={16 * textScale} />
+            <Text style={[styles.balanceText, { fontSize: 13 * textScale }]}>Total coins: {stats.totalCoins}</Text>
+          </View>
         </View>
       </ScrollView>
     </Screen>
@@ -302,5 +306,10 @@ const styles = StyleSheet.create({
   balanceText: {
     color: 'rgba(255,255,255,0.95)',
     fontWeight: '700',
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
 });

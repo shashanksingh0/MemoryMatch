@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { palette, radius } from '../theme/colors';
 import { Screen } from '../components/Screen';
 import { Header } from '../components/Header';
+import { CoinIcon } from '../components/CoinIcon';
 import { useSettings } from '../context/SettingsContext';
 import { ACHIEVEMENTS } from '../utils/achievements';
 import { bestTimeOverall } from '../utils/stats';
@@ -16,14 +17,18 @@ interface AchievementScreenProps {
 interface StatCellProps {
   label: string;
   value: string;
-  emoji: string;
+  emoji: React.ReactNode;
   textScale: number;
 }
 
 function StatCell({ label, value, emoji, textScale }: StatCellProps) {
   return (
     <View style={styles.statCell}>
-      <Text style={{ fontSize: 24 * textScale }}>{emoji}</Text>
+      {typeof emoji === 'string' ? (
+        <Text style={{ fontSize: 24 * textScale }}>{emoji}</Text>
+      ) : (
+        emoji
+      )}
       <Text style={[styles.statValue, { fontSize: 20 * textScale }]}>{value}</Text>
       <Text style={[styles.statLabel, { fontSize: 12 * textScale }]}>{label}</Text>
     </View>
@@ -48,7 +53,7 @@ export function AchievementScreen({ onBack }: AchievementScreenProps) {
             <StatCell label="Games Won" value={String(stats.gamesWon)} emoji="🏆" textScale={textScale} />
             <StatCell label="Best Time" value={bestTime != null ? formatTime(bestTime) : '—'} emoji="⏱️" textScale={textScale} />
             <StatCell label="Highest Score" value={String(stats.highestScore)} emoji="💎" textScale={textScale} />
-            <StatCell label="Total Coins" value={String(stats.totalCoins)} emoji="🪙" textScale={textScale} />
+            <StatCell label="Total Coins" value={String(stats.totalCoins)} emoji={<CoinIcon size={24 * textScale} />} textScale={textScale} />
             <StatCell label="Accuracy" value={`${accuracy}%`} emoji="🎯" textScale={textScale} />
             <StatCell label="Current Streak" value={String(stats.currentStreak)} emoji="🔥" textScale={textScale} />
             <StatCell label="Longest Streak" value={String(stats.longestStreak)} emoji="🚀" textScale={textScale} />

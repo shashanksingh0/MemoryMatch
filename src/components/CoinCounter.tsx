@@ -1,7 +1,8 @@
 import React, { memo, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import { palette } from '../theme/colors';
+import { CoinIcon } from './CoinIcon';
 
 interface CoinCounterProps {
   coins: number;
@@ -25,7 +26,7 @@ export const CoinCounter = memo(function CoinCounter({ coins, textScale }: CoinC
 
   return (
     <View style={styles.pill} accessibilityLabel={`${coins} coins`}>
-      <Text style={{ fontSize: 18 * textScale }}>🪙</Text>
+      <CoinIcon size={20 * textScale} />
       <Animated.Text style={[styles.value, { fontSize: 20 * textScale }, animatedStyle]}>{coins}</Animated.Text>
     </View>
   );
